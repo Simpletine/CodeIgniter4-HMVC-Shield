@@ -1,12 +1,12 @@
-<@php
+<?php
 
-namespace {namespace};
+namespace App\Modules\Admin\Models;
 
 use CodeIgniter\Model;
 
-class {class} extends Model
+class Admin extends Model
 {
-    protected $table            = '{table}'; 
+    protected $table            = 'st_admin'; 
     protected $useTimestamps    = true;
     protected $useSoftDeletes   = true;
     protected $allowedFields    = [];

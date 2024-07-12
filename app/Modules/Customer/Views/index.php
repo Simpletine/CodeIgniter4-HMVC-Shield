@@ -239,18 +239,17 @@
 
 <section>
 
-    <h1>About SimpleTine HMVC</h1>
+    <h1>About this page</h1>
 
-    <p>Use command line to generate a module, replace [Blogs] to the module name</p>
-    <pre><code>php spark module:create [Blogs]</code></pre>
+    <p>The page you are looking at is being generated dynamically by CodeIgniter.</p>
 
-    <p>The corresponding MVC and Config for this module can be found at:</p>
+    <p>If you would like to edit this page you will find it located at:</p>
 
-    <pre><code>app/Modules/[Blogs]</code></pre>
+    <pre><code>app/Views/welcome_message.php</code></pre>
 
-    <p>The corresponding route for this page can be found at:</p>
+    <p>The corresponding controller for this page can be found at:</p>
 
-    <pre><code>app/Modules/[Blogs]/Config/Routes.php</code></pre>
+    <pre><code>app/Controllers/Home.php</code></pre>
 
 </section>
 
