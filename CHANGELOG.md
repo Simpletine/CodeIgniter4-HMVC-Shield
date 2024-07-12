@@ -6,10 +6,10 @@
 - Renamed command `make:module` to `module:create` for better consistency
 
 ### Features
-- Added module `config` folder for management of routes within configs ([#5](/issues/5))
-- `module:controller`: Create a controller in a specified module ([#4](/issues/4))
-- `module:model`: Create a model in a specified module ([#3](/issues/3))
-- `module:copy`: Copy an existing module and rename key elements ([#2](/issues/2))
+- Added module `config` folder for management of routes within configs ([#5](https://github.com/Simpletine/CodeIgniter4-HMVC/issues/5))
+- `module:controller`: Create a controller in a specified module ([#4](https://github.com/Simpletine/CodeIgniter4-HMVC/issues/4))
+- `module:model`: Create a model in a specified module ([#3](https://github.com/Simpletine/CodeIgniter4-HMVC/issues/3))
+- `module:copy`: Copy an existing module and rename key elements ([#2](https://github.com/Simpletine/CodeIgniter4-HMVC/issues/2))
 
 ## v1.0.0 - 2024-06-22
 
