@@ -1,25 +1,25 @@
-<@php
+<?php
 
-namespace {namespace};
+namespace App\Modules\Admin\Controllers;
 
-use {useStatement};
-use {useModelStatement};
+use App\Controllers\BaseController;
+use App\Modules\Admin\Models\Admin;
 
-class {class} extends {extends}
+class Index extends BaseController
 {
-    protected $folder_directory = "Modules\\{directoryName}\\Views\\";
+    protected $folder_directory = "Modules\\Admin\\Views\\";
     protected $model;
     protected $data = [];
     protected $rules = [];
 
     public function __construct()
     {
-        $this->model = new {modelClass};
+        $this->model = new Admin;
     }
 
     public function index()
     {
-        return self::render('index');
+        return self::render('welcome_message');
     }
 
     public function render(string $page): string

@@ -1,7 +1,6 @@
-# Codeigniter4-HMVC
+# Codeigniter 4 HMVC 
 
-[![Official Website](https://img.shields.io/badge/Official_Website-Visit-yellow)](https://simpletine.com)  
-[![YouTube Channel](https://img.shields.io/badge/YouTube_Channel-Subscribe-FF0000)](https://www.youtube.com/channel/UCRuDf31rPyyC2PUbsMG0vZw) 
+[![Official Website](https://img.shields.io/badge/Official_Website-Visit-yellow)](https://simpletine.com)   [![YouTube Channel](https://img.shields.io/badge/YouTube_Channel-Subscribe-FF0000)](https://www.youtube.com/channel/UCRuDf31rPyyC2PUbsMG0vZw) 
  
 ### Prerequisites
 1. PHP 7.4 or above
@@ -9,10 +8,40 @@
 2. CodeIgniter 4.4.8
 
 ### Installation Guide
-For the guideline, see the [documentation](/INSTALLING.md) 
+
+Clone project to your project root folder
+```bash
+composer create-project simpletine/codeigniter4-hmvc ci4_hmvc --stability=dev
+```
+Or
+```bash
+git clone https://github.com/Simpletine/CodeIgniter4-HMVC.git ci4_hmvc
+```
+Then
+```bash
+cd ci4_hmvc
+``` 
+
+Copy some require file to root folder (Upgrading to v4.4.8)
+```bash
+composer update
+cp vendor/codeigniter4/framework/public/index.php public/index.php
+cp vendor/codeigniter4/framework/spark spark
+```
+
+Copy `env` file
+```bash
+cp env .env
+```
+
+Run the app, using different port, add options `--port=9000`
+```bash
+php spark serve
+```
+
 
 ---
-## Generate New Module 
+## Module Commands
 ```bash
 php spark make:module [module] 
 ```
@@ -25,20 +54,20 @@ php spark make:module blogs
 
 ###  Result Directory
     App 
-    ├── Config       
-    │   └── Routes.php (Added group called blogs)
     ├── Modules      
     │   └── Blogs
+    │       ├──  Config
+    │           └──  Routes.php
     │       ├──  Controllers
     │           └──  Blogs.php
     │       ├──  Models
-    │           └──  BlogsModel.php
+    │           └──  Blogs.php
     │       └──  Views
     │           └──  index.php
     └── ...  
 
 ### Route Group
-After generate `Blogs` Module, add a route group for the module at `App\Config\Routes.php`
+After generate `Blogs` Module, the routes group for the module at `Modules\Config\Routes.php`
 ```php
 $routes->group(
     'blogs', ['namespace' => '\Modules\Blogs\Controllers'], function ($routes) {
@@ -59,6 +88,3 @@ public $psr4 = [
     // ...
 ];
 ```
----
-### Contribute
-To contribute to this repository and extend its architectural capabilities or you find an issue, follow these [steps](/CONTRIBUTE.md)
