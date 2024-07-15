@@ -1,11 +1,29 @@
 # Change Log
 
+## v1.2.0-alpha - 2024-07-16
+
+### Fixed
+- Fix: Template file not found: `controller.new.tpl.php`
+
+### Changes
+
+- Update README.md and CHANGELOG.md
+
+### Features
+
+- Implement CodeIgniter Shield
+- Implement AdminLTE
+- Coding Standard
+
+
 ## v1.1.0 - 2024-07-13
 
 ### Changes
+
 - Renamed command `make:module` to `module:create` for better consistency
 
 ### Features
+
 - Added module `config` folder for management of routes within configs ([#5](https://github.com/Simpletine/CodeIgniter4-HMVC/issues/5))
 - `module:controller`: Create a controller in a specified module ([#4](https://github.com/Simpletine/CodeIgniter4-HMVC/issues/4))
 - `module:model`: Create a model in a specified module ([#3](https://github.com/Simpletine/CodeIgniter4-HMVC/issues/3))

@@ -6,13 +6,16 @@
     "homepage": "https://simpletine.com",
     "require": {
         "php": "^7.4 || ^8.0",
-        "codeigniter4/framework": "^4.0"
+        "codeigniter4/framework": "^4.0",
+        "codeigniter4/shield": "dev-develop"
     },
     "require-dev": {
+        "codeigniter/coding-standard": "^1.7",
         "fakerphp/faker": "^1.23.1",
         "mikey179/vfsstream": "^1.6",
         "phpstan/phpstan": "2.0.x-dev",
-        "phpunit/phpunit": "^9.1"
+        "phpunit/phpunit": "^9.1",
+        "squizlabs/php_codesniffer": "*"
     },
     "autoload": {
         "exclude-from-classmap": [
@@ -25,7 +28,8 @@
         "sort-packages": true
     },
     "scripts": {
-        "test": "phpunit"
+        "test": "phpunit",
+        "fix": "vendor/bin/php-cs-fixer fix --verbose"
     },
     "minimum-stability": "dev"
 }

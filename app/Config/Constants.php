@@ -1,18 +1,16 @@
 <?php
 
-/*
- | --------------------------------------------------------------------
- | App Namespace
- | --------------------------------------------------------------------
- |
- | This defines the default Namespace that is used throughout
- | CodeIgniter to refer to the Application directory. Change
- | this constant to change the namespace that all application
- | classes should use.
- |
- | NOTE: changing this will require manually modifying the
- | existing namespaces of App\* namespaced-classes.
+declare(strict_types=1);
+
+/**
+ * This file is part of CodeIgniter 4 framework.
+ *
+ * (c) 2021 CodeIgniter Foundation <admin@codeigniter.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
  */
+
 defined('APP_NAMESPACE') || define('APP_NAMESPACE', 'App');
 
 /*

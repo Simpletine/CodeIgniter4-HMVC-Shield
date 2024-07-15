@@ -23,7 +23,7 @@ class {class} extends {extends}
     }
 
     public function render(string $page): string
-    { 
+    {
         return view( $this->folder_directory . $page, $this->data);
     }
 }

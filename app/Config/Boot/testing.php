@@ -1,9 +1,14 @@
 <?php
 
-/*
- * The environment testing is reserved for PHPUnit testing. It has special
- * conditions built into the framework at various places to assist with that.
- * You can’t use it for your development.
+declare(strict_types=1);
+
+/**
+ * This file is part of CodeIgniter 4 framework.
+ *
+ * (c) 2021 CodeIgniter Foundation <admin@codeigniter.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
  */
 
 /*

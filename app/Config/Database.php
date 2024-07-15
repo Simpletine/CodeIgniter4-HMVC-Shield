@@ -1,5 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * This file is part of CodeIgniter 4 framework.
+ *
+ * (c) 2021 CodeIgniter Foundation <admin@codeigniter.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace Config;
 
 use CodeIgniter\Database\Config;
@@ -9,7 +20,6 @@ use CodeIgniter\Database\Config;
  */
 class Database extends Config
 {
-
     /**
      * The directory that holds the Migrations
      * and Seeds directories.
@@ -68,7 +78,6 @@ class Database extends Config
         'port'         => 3306,
         'numberNative' => false,
     ];
-
     public array $lyrics = [
         'DSN'          => '',
         'hostname'     => 'localhost',
@@ -97,13 +106,13 @@ class Database extends Config
      * @var array<string, mixed>
      */
     public array $tests = [
-        'DSN'         => '',
-        'hostname'    => '127.0.0.1',
-        'username'    => '',
-        'password'    => '',
-        'database'    => ':memory:',
-        'DBDriver'    => 'SQLite3',
-        'DBPrefix'    => 'db_',
+        'DSN'      => '',
+        'hostname' => '127.0.0.1',
+        'username' => '',
+        'password' => '',
+        'database' => ':memory:',
+        'DBDriver' => 'SQLite3',
+        'DBPrefix' => 'db_',
         // Needed to ensure we're working correctly with prefixes live. DO NOT REMOVE FOR CI DEVS
         'pConnect'    => false,
         'DBDebug'     => true,
