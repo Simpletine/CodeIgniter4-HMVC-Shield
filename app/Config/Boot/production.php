@@ -1,14 +1,16 @@
 <?php
 
-/*
- |--------------------------------------------------------------------------
- | ERROR DISPLAY
- |--------------------------------------------------------------------------
- | Don't show ANY in production environments. Instead, let the system catch
- | it and display a generic error message.
- |
- | If you set 'display_errors' to '1', CI4's detailed error report will show.
+declare(strict_types=1);
+
+/**
+ * This file is part of CodeIgniter 4 framework.
+ *
+ * (c) 2021 CodeIgniter Foundation <admin@codeigniter.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
  */
+
 ini_set('display_errors', '0');
 error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
 

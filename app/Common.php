@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * The goal of this file is to allow developers a location
- * where they can overwrite core procedural functions and
- * replace them with their own. This file is loaded during
- * the bootstrap process and is called during the framework's
- * execution.
+ * This file is part of CodeIgniter 4 framework.
  *
- * This can be looked at as a `master helper` file that is
- * loaded early on, and may also contain additional functions
- * that you'd like to use throughout your entire application
+ * (c) 2021 CodeIgniter Foundation <admin@codeigniter.com>
  *
- * @see: https://codeigniter.com/user_guide/extending/common.html
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
  */
+
+if (! function_exists('is_route')) {
+    function is_route($route_name)
+    {
+        return $route_name === service('router')->getMatchedRoute()[0];
+    }
+}

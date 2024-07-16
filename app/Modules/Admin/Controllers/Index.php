@@ -1,5 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * This file is part of CodeIgniter 4 framework.
+ *
+ * (c) 2021 CodeIgniter Foundation <admin@codeigniter.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace App\Modules\Admin\Controllers;
 
 use App\Controllers\BaseController;
@@ -7,23 +18,32 @@ use App\Modules\Admin\Models\Admin;
 
 class Index extends BaseController
 {
-    protected $folder_directory = "Modules\\Admin\\Views\\";
+    protected $folder_directory = 'Modules\\Admin\\Views\\';
     protected $model;
-    protected $data = [];
+    protected $data  = [];
     protected $rules = [];
 
     public function __construct()
     {
-        $this->model = new Admin;
+        $this->model = new Admin();
     }
 
     public function index()
     {
-        return self::render('welcome_message');
+        if (! user_id()) {
+            return redirect()->route('login');
+        }
+        $this->data['page_title']  = 'Admin - Dashboard';
+        $this->data['page_header'] = 'Dashboard';
+        $this->data['contents']    = [
+            $this->folder_directory . 'index',
+        ];
+
+        return self::render();
     }
 
-    public function render(string $page): string
-    { 
-        return view( $this->folder_directory . $page, $this->data);
+    public function render(): string
+    {
+        return view('index', $this->data);
     }
 }

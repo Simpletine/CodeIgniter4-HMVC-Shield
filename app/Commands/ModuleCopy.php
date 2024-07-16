@@ -1,5 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * This file is part of CodeIgniter 4 framework.
+ *
+ * (c) 2021 CodeIgniter Foundation <admin@codeigniter.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace App\Commands;
 
 use CodeIgniter\CLI\BaseCommand;
@@ -67,22 +78,25 @@ class ModuleCopy extends BaseCommand
         $oldModule = array_shift($params);
         $newModule = array_shift($params);
 
-        if (!$oldModule || !$newModule) {
+        if (! $oldModule || ! $newModule) {
             CLI::error('Both old and new module names are required.');
             $this->showHelp();
+
             return;
         }
 
-        $sourceDir = APPPATH . "Modules/$oldModule";
-        $destDir = APPPATH . "Modules/$newModule";
+        $sourceDir = APPPATH . "Modules/{$oldModule}";
+        $destDir   = APPPATH . "Modules/{$newModule}";
 
-        if (!is_dir($sourceDir)) {
-            CLI::error("Source module '$oldModule' does not exist.");
+        if (! is_dir($sourceDir)) {
+            CLI::error("Source module '{$oldModule}' does not exist.");
+
             return;
         }
 
         if (is_dir($destDir)) {
-            CLI::error("Destination module '$newModule' already exists.");
+            CLI::error("Destination module '{$newModule}' already exists.");
+
             return;
         }
 
@@ -90,19 +104,16 @@ class ModuleCopy extends BaseCommand
         $this->replacePlaceholders($destDir, $oldModule, $newModule);
         $this->renameModelFile($destDir, $oldModule, $newModule);
 
-        CLI::write("Module '$oldModule' has been copied to '$newModule'.", 'green');
+        CLI::write("Module '{$oldModule}' has been copied to '{$newModule}'.", 'green');
     }
 
     /**
      * Recursively copy a directory.
-     *
-     * @param string $source
-     * @param string $dest
      */
     private function recursiveCopy(string $source, string $dest)
     {
         $directoryIterator = new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS);
-        $iterator = new RecursiveIteratorIterator($directoryIterator, RecursiveIteratorIterator::SELF_FIRST);
+        $iterator          = new RecursiveIteratorIterator($directoryIterator, RecursiveIteratorIterator::SELF_FIRST);
 
         foreach ($iterator as $item) {
             $destPath = $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName();
@@ -116,17 +127,13 @@ class ModuleCopy extends BaseCommand
 
     /**
      * Replace placeholders in copied files.
-     *
-     * @param string $directory
-     * @param string $oldModule
-     * @param string $newModule
      */
     private function replacePlaceholders(string $directory, string $oldModule, string $newModule)
     {
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory));
 
-        $oldModuleCamel = pascalize($oldModule);
-        $newModuleCamel = pascalize($newModule);
+        $oldModuleCamel  = pascalize($oldModule);
+        $newModuleCamel  = pascalize($newModule);
         $oldModulePlural = plural($oldModuleCamel);
         $newModulePlural = plural($newModuleCamel);
 
@@ -151,15 +158,11 @@ class ModuleCopy extends BaseCommand
 
     /**
      * Rename the model file if necessary.
-     *
-     * @param string $directory
-     * @param string $oldModule
-     * @param string $newModule
      */
     private function renameModelFile(string $directory, string $oldModule, string $newModule)
     {
-        $oldModelFile = "$directory/Models/" . pascalize($oldModule) . ".php";
-        $newModelFile = "$directory/Models/" . pascalize($newModule) . ".php";
+        $oldModelFile = "{$directory}/Models/" . pascalize($oldModule) . '.php';
+        $newModelFile = "{$directory}/Models/" . pascalize($newModule) . '.php';
 
         if (file_exists($oldModelFile)) {
             rename($oldModelFile, $newModelFile);
