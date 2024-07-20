@@ -1,6 +1,6 @@
 {
-    "name": "simpletine/codeigniter4-hmvc",
-    "description": "CodeIgniter4 HMVC Architecture",
+    "name": "simpletine/codeigniter4-hmvc-shield",
+    "description": "CodeIgniter4 HMVC Architecture with Shield Authentication and AdminPanel",
     "license": "MIT",
     "type": "project",
     "homepage": "https://simpletine.com",
