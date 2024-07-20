@@ -12,7 +12,7 @@ This repository features a modular HMVC (Hierarchical Model-View-Controller) arc
 
 Clone project to your project root folder
 ```bash
-git clone https://github.com/Simpletine/CodeIgniter4-HMVC.git ci4_hmvc
+git clone https://github.com/Simpletine/CodeIgniter4-HMVC-Shield.git ci4_hmvc
 ```
 
 Or
