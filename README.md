@@ -8,7 +8,7 @@ This repository features a modular HMVC (Hierarchical Model-View-Controller) arc
 
 Create a project
 ```bash
-composer create-project simpletine/codeigniter4-starter ci4_hmvc
+composer create-project simpletine/codeigniter4-starter ci4_hmvc --stability=dev
 ```
 
 Copy `env` file and setup database environment
@@ -37,6 +37,11 @@ php spark db:create ci4_project
 Setup shield
 ```bash 
 php spark shield:setup
+```
+
+Run all migration
+```bash 
+php spark migrate --all
 ```
 
 Run publisher for AdminLTE resources
