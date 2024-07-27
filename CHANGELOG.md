@@ -1,5 +1,13 @@
 # Change Log
 
+## v1.2.0-beta - 2024-07-27
+
+### Major Update
+- Transitioned from traditional manual installation to Composer installation.
+  - This change enhances stability in version control.
+  - You can now install the package via Composer using: `composer require simpletine/hmvc-shield`.
+  - This update significantly speeds up the setup process.
+
 ## v1.2.0-alpha - 2024-07-16
 
 ### Fixed
