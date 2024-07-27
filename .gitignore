@@ -126,5 +126,3 @@ nb-configuration.xml
 /phpunit*.xml
 /.phpunit.*.cache
 
-# SimpleTine
-!public/assets/*

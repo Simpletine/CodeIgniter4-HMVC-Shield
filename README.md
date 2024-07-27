@@ -3,25 +3,15 @@
 # Codeigniter 4 HMVC 
 This repository features a modular HMVC (Hierarchical Model-View-Controller) architecture for CodeIgniter 4, integrated with the official authentication system, CodeIgniter 4 Shield. It also includes a comprehensive Admin Dashboard built with AdminLTE, providing a robust foundation for scalable and secure web applications.
 
-## Prerequisites
-1. PHP 7.4 or above
-2. Composer required
-2. CodeIgniter 4.4.8
 
 # Installation Guide
 
-Clone project to your project root folder
+Create a project
 ```bash
-git clone https://github.com/Simpletine/CodeIgniter4-HMVC-Shield.git ci4_hmvc
+composer create-project simpletine/codeigniter4-starter ci4_hmvc
 ```
 
-Or
-
-```bash
-composer create-project simpletine/codeigniter4-hmvc ci4_hmvc --stability=dev
-```
-
-Copy `env` file
+Copy `env` file and setup database environment
 ```bash
 cp env .env
 ```
@@ -31,18 +21,29 @@ Run the app, using different port, add options `--port=9000`
 php spark serve
 ```
 
-## Database Configuration
-Create database & sessions migration
+## Configuration
+Install HMVC package
 
 ```bash
-php spark db:create ci4_shield
+composer require simpletine/hmvc-shield
 ```
 
+Create database
+
 ```bash
-php spark make:migration --session
+php spark db:create ci4_project
+```
+
+Setup shield
+```bash 
 php spark shield:setup
 ```
 
+Run publisher for AdminLTE resources
+```bash
+php spark publish:assets
+php spark publish:views
+```
 
 ## Default Auth
 
@@ -87,6 +88,17 @@ php spark module:controller Blogs Categories
 Create a model to module `Blogs` named `Categories.php`
 ```bash
 php spark module:model Blogs Categories 
+```
+
+## Publisher
+Publish require assets to `public` folder
+```bash
+php spark publish:assets 
+```
+
+Publish views with `AdminLTE` to `COnfig/Auth.php`
+```bash
+php spark publish:views 
 ```
 
 ## Admin

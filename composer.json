@@ -1,9 +1,29 @@
 {
-    "name": "simpletine/codeigniter4-hmvc-shield",
-    "description": "CodeIgniter4 HMVC Architecture with Shield Authentication and AdminPanel",
+    "name": "simpletine/hmvc-shield",
+    "description": "Features a modular HMVC (Hierarchical Model-View-Controller) architecture for CodeIgniter 4, integrated CodeIgniter 4 Shield and built with AdminLTE, providing a robust foundation for scalable web applications.",
+    "type": "library",
     "license": "MIT",
-    "type": "project",
-    "homepage": "https://simpletine.com",
+    "authors": [
+        {
+            "name": "SimpleTine",
+            "email": "info@simpletine.com"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/Simpletine/CodeIgniter4-HMVC-Shield"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Simpletine\\HMVCShield\\": "/"
+        },
+        "files": [
+            "autoload.php"
+        ]
+    },
     "require": {
         "php": "^7.4 || ^8.0",
         "codeigniter4/framework": "^4.0",
@@ -17,19 +37,8 @@
         "phpunit/phpunit": "^9.1",
         "squizlabs/php_codesniffer": "*"
     },
-    "autoload": {
-        "exclude-from-classmap": [
-            "**/Database/Migrations/**"
-        ]
-    },
-    "config": {
-        "optimize-autoloader": true,
-        "preferred-install": "dist",
-        "sort-packages": true
-    },
     "scripts": {
         "test": "phpunit",
         "fix": "vendor/bin/php-cs-fixer fix --verbose"
-    },
-    "minimum-stability": "dev"
+    }
 }
