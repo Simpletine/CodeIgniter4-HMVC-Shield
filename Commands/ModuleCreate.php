@@ -135,7 +135,7 @@ class ModuleCreate extends BaseCommand
     {
         helper('inflector');
         $className = pascalize($moduleName);
-        $isAdmin   = CLI::getOption('admin');
+        $isAdmin   = CLI::getOption('admin');        
 
         $templates = [
             $isAdmin ? 'controller.admin.tpl.php' : 'controller.tpl.php' => [
@@ -145,7 +145,8 @@ class ModuleCreate extends BaseCommand
                     '{useModelStatement}' => "App\\Modules\\{$moduleName}\\Models\\{$className}",
                     '{useStatement}'      => 'App\Controllers\BaseController',
                     '{class}'             => 'Index',
-                    '{modelClass}'        => $className,
+                    '{lowerClass}'        => 'index',
+                    '{modelClass}'        => $className,                
                     '{extends}'           => 'BaseController',
                     '{directoryName}'     => $moduleName,
                 ],
