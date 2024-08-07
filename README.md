@@ -50,6 +50,10 @@ php spark publish:assets
 php spark publish:views
 ```
 
+Publish Sidebar
+```bash
+php spark publish:config
+```
 ## Default Auth
 
 ```bash

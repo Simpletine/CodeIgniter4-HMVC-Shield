@@ -188,23 +188,36 @@
                         data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
                  with font-awesome or any other icon font library -->
-                        <li class="nav-item">
-                            <a href="<?= route_to('admin')?>"
-                                class="nav-link <?= is_route('admin') ? 'active' : '' ?>">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>
-                                    Dashboard
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= route_to('users')?>" class="nav-link <?= is_route('users') ? 'active' : '' ?>">
-                                <i class="nav-icon fas fa-users"></i>
-                                <p>
-                                    Users
-                                </p>
-                            </a>
-                        </li>
+                 <?php
+                 if($stn_config = config('StnConfig.php')) {
+                     $sidebars = $stn_config->sidebars;
+
+                     foreach($sidebars as $sidebar) {
+                         echo '<li ' . stringify_attributes($sidebar['attributes']) . '>';
+                         echo '<a ' . stringify_attributes($sidebar['anchor']) . '>';
+                         echo '<i class="nav-icon ' . ($sidebar['icon_class']) . '"></i>';
+                         if(array_key_exists('dropdown_items', $sidebar) && is_array($sidebar['dropdown_items'])) {
+                             echo '<p>' . ($sidebar['label']) . '<i class="right fas fa-angle-left"></i></p>';
+                             echo '</a>';
+
+                             foreach($sidebar['dropdown_items'] as $item) {
+                                 echo '<ul class="nav nav-treeview">';
+                                 echo '<li ' . stringify_attributes($sidebar['attributes']) . '>';
+                                 echo '<a ' . stringify_attributes($item['anchor']) . '>';
+                                 echo '<i class="nav-icon ' . ($item['icon_class']) . '"></i>';
+                                 echo '<p>' . ($item['label']) . '</p>';
+                                 echo '</a>';
+                                 echo '</li>';
+                                 echo '</ul>';
+                             }
+                         } else {
+                             echo '<p>' . ($sidebar['label']) . '</p>';
+                             echo '</a>';
+                         }
+                         echo '</li>';
+                     }
+                 }
+?>
                         <li class="nav-item">
                             <a href="#" class="nav-link bg-danger">
                                 <i class="nav-icon fas fa-sign-out-alt"></i>
@@ -245,9 +258,9 @@
                 <div class="container-fluid">
                     <?php if (isset($contents) && is_array($contents)) : ?>
                         <?php
-                        foreach ($contents as $content) {
-                            echo view($content);
-                        }
+       foreach ($contents as $content) {
+           echo view($content);
+       }
                         ?>
                     <?php endif; ?>
                     <!-- /.row -->
