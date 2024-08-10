@@ -162,7 +162,8 @@
                 <!-- Sidebar user panel (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <img src="/assets/simpletine/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                        <img src="/assets/simpletine/img/user2-160x160.jpg" class="img-circle elevation-2"
+                            alt="User Image">
                     </div>
                     <div class="info">
                         <a href="#" class="d-block"><?= username()?></a>
@@ -188,44 +189,36 @@
                         data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
                  with font-awesome or any other icon font library -->
-                 <?php
-                 if($stn_config = config('StnConfig.php')) {
-                     $sidebars = $stn_config->sidebars;
+                        <?php
+                    if ($stn_config = config('StnConfig.php')) {
+                        $sidebars = $stn_config->sidebars;
 
-                     foreach($sidebars as $sidebar) {
-                         echo '<li ' . stringify_attributes($sidebar['attributes']) . '>';
-                         echo '<a ' . stringify_attributes($sidebar['anchor']) . '>';
-                         echo '<i class="nav-icon ' . ($sidebar['icon_class']) . '"></i>';
-                         if(array_key_exists('dropdown_items', $sidebar) && is_array($sidebar['dropdown_items'])) {
-                             echo '<p>' . ($sidebar['label']) . '<i class="right fas fa-angle-left"></i></p>';
-                             echo '</a>';
+                        foreach ($sidebars as $sidebar) {
+                            echo '<li ' . stringify_attributes($sidebar['attributes']) . '>';
+                            echo '<a ' . stringify_attributes($sidebar['anchor']) . '>';
+                            echo '<i class="nav-icon ' . ($sidebar['icon_class']) . '"></i>';
+                            if (array_key_exists('dropdown_items', $sidebar) && is_array($sidebar['dropdown_items'])) {
+                                echo '<p>' . ($sidebar['label']) . '<i class="right fas fa-angle-left"></i></p>';
+                                echo '</a>';
 
-                             foreach($sidebar['dropdown_items'] as $item) {
-                                 echo '<ul class="nav nav-treeview">';
-                                 echo '<li ' . stringify_attributes($sidebar['attributes']) . '>';
-                                 echo '<a ' . stringify_attributes($item['anchor']) . '>';
-                                 echo '<i class="nav-icon ' . ($item['icon_class']) . '"></i>';
-                                 echo '<p>' . ($item['label']) . '</p>';
-                                 echo '</a>';
-                                 echo '</li>';
-                                 echo '</ul>';
-                             }
-                         } else {
-                             echo '<p>' . ($sidebar['label']) . '</p>';
-                             echo '</a>';
-                         }
-                         echo '</li>';
-                     }
-                 }
+                                foreach ($sidebar['dropdown_items'] as $item) {
+                                    echo '<ul class="nav nav-treeview">';
+                                    echo '<li ' . stringify_attributes($sidebar['attributes']) . '>';
+                                    echo '<a ' . stringify_attributes($item['anchor']) . '>';
+                                    echo '<i class="nav-icon ' . ($item['icon_class']) . '"></i>';
+                                    echo '<p>' . ($item['label']) . '</p>';
+                                    echo '</a>';
+                                    echo '</li>';
+                                    echo '</ul>';
+                                }
+                            } else {
+                                echo '<p>' . ($sidebar['label']) . '</p>';
+                                echo '</a>';
+                            }
+                            echo '</li>';
+                        }
+                    }
 ?>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link bg-danger">
-                                <i class="nav-icon fas fa-sign-out-alt"></i>
-                                <p>
-                                    Logout
-                                </p>
-                            </a>
-                        </li>
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->
@@ -256,13 +249,10 @@
             <!-- Main content -->
             <div class="content">
                 <div class="container-fluid">
-                    <?php if (isset($contents) && is_array($contents)) : ?>
-                        <?php
-       foreach ($contents as $content) {
-           echo view($content);
-       }
-                        ?>
-                    <?php endif; ?>
+                    <?php if (isset($contents) && is_array($contents)) :
+                        foreach ($contents as $content) {
+                            echo view($content);
+                        }  endif; ?>
                     <!-- /.row -->
                 </div><!-- /.container-fluid -->
             </div>
@@ -310,13 +300,23 @@
     <!-- AdminLTE App -->
     <script src="/assets/simpletine/js/adminlte.min.js"></script>
 
+    <!-- Javascript Files -->
+    <?php if (isset($js) && is_array($js)) {
+        foreach ($js as $file) {
+            echo '<script src="' . $file . '"></script>';
+        }
+    } ?>
+
+    <!-- Script Files -->
     <?php if (isset($scripts) && is_array($scripts)) : ?>
-        <?php
+    <?php
         foreach ($scripts as $script) {
             echo view($script);
         }
         ?>
     <?php endif; ?>
+
+
 </body>
 
 </html>

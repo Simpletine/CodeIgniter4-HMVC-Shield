@@ -1,5 +1,21 @@
 # Change Log
 
+## v1.3.0 - 2024-08-10
+
+### Features
+- Sidebar nav items customization
+- Allow Custom CSS file and JavaScript files
+- New spark command `simpletine:setup` to achieve quick installation 
+
+### Fixed
+- Fixed Command `module:create` missing replacer issue
+
+### Changes
+
+- Remove fixed logout button from sidebar
+- Added logout nav item to `StnConfig.php`
+- Update assets directory
+
 ## v1.2.0-beta - 2024-07-27
 
 ### Major Update
