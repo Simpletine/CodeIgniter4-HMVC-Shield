@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/assets/simpletine/plugins/fontawesome-free/css/all.min.css">
     <!-- icheck bootstrap -->
     <link rel="stylesheet" href="/assets/simpletine/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-    <?php if(isset($is_datatables) && $is_datatables) :?>
+    <?php if (isset($is_datatables) && $is_datatables) :?>
     <!-- DataTables -->
     <link rel="stylesheet" href="/assets/simpletine/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="/assets/simpletine/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
@@ -15,4 +15,11 @@
 
     <!-- Theme style -->
     <link rel="stylesheet" href="/assets/simpletine/css/adminlte.min.css">
+
+    <!-- CSS Files -->
+    <?php if (isset($css) && is_array($css)) {
+        foreach($css as $file) {
+            echo '<link rel="stylesheet" href="' . $file . '">';
+        }
+    } ?>
 </head>

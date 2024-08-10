@@ -60,5 +60,16 @@ class StnConfig extends BaseConfig
                 ],
             ],
         ],
+        [
+            'label'      => 'Logout',
+            'attributes' => [
+                'class' => 'nav-item',
+            ],
+            'icon_class' => 'fas fas fa-sign-out-alt',
+            'anchor'     => [
+                'href'  => '/logout',
+                'class' => 'nav-link bg-danger',
+            ],
+        ],
     ];
 }

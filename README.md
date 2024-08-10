@@ -28,32 +28,12 @@ Install HMVC package
 composer require simpletine/hmvc-shield
 ```
 
-Create database
+Setup Command Line
 
 ```bash
-php spark db:create ci4_project
+php spark simpletine:setup
 ```
 
-Setup shield
-```bash 
-php spark shield:setup
-```
-
-Run all migration
-```bash 
-php spark migrate --all
-```
-
-Run publisher for AdminLTE resources
-```bash
-php spark publish:assets
-php spark publish:views
-```
-
-Publish Sidebar
-```bash
-php spark publish:config
-```
 ## Default Auth
 
 ```bash
