@@ -28,8 +28,6 @@ class SeedAdminUser extends Migration
             'password' => 'password',
         ]);
         $users->save($user);
-        $user = $users->findById($users->getInsertID());
-        $user->addGroup('superadmin');
     }
 
     public function down()
