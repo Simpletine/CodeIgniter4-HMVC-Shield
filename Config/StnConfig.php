@@ -17,7 +17,39 @@ use CodeIgniter\Config\BaseConfig;
 
 class StnConfig extends BaseConfig
 {
-    public array $sidebars = [
+    // Brand site variable
+    public string $site_name           = 'SimpleTine';
+    public string $site_url            = 'http://simpletine.com';
+    public array $site_name_attributes = [
+        'class' => 'brand-text font-weight-light',
+    ];
+    public array $site_logo_panel = [
+        'src'   => '/assets/simpletine/img/AdminLTELogo.png',
+        'class' => 'brand-image img-circle elevation-3',
+        'alt'   => 'Site Logo',
+        'style' => 'opacity: .8',
+    ];
+    public string $site_route_to         = 'admin';
+    public array $site_anchor_attributes = [
+        'class' => 'brand-link',
+    ];
+    public array $sidebar_user_panel = [
+        'show_panel'  => true,
+        'panel_image' => [
+            'src'   => '/assets/simpletine/img/user2-160x160.jpg',
+            'class' => 'img-circle elevation-2',
+            'alt'   => 'User Image',
+        ],
+        'panel_html' => null,
+    ];
+    public array $sidebar_search_panel = [
+        'show_panel'  => true,
+        'search_icon' => [
+            'class' => 'fas fa-search fa-fw',
+        ],
+        'panel_html' => null,
+    ];
+    public array $sidebars = [ // Sting as HTML
         // General Item Sample
         [
             'label'      => 'Dashboard',
@@ -71,5 +103,16 @@ class StnConfig extends BaseConfig
                 'class' => 'nav-link bg-danger',
             ],
         ],
+    ];
+    public array $sidebar_control_panel = [
+        'show_panel' => false,
+        'panel_html' => null,
+    ];
+    public array $footer = [
+        'show_footer'       => true,
+        'footer_attributes' => [
+            'class' => 'main-footer',
+        ],
+        'footer_html' => null,
     ];
 }

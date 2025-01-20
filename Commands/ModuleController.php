@@ -66,6 +66,8 @@ class ModuleController extends BaseCommand
      */
     protected $options = [
         '--admin' => 'Use admin template',
+        '--crud'  => 'Setup with basic CRUD method and empty array prepared',
+        '--api'   => 'Setup with basic API method and empty array prepared',
     ];
 
     /**

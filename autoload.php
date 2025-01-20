@@ -12,4 +12,5 @@ declare(strict_types=1);
  */
 
 require_once __DIR__ . '/Config/Constants.php';
+require_once __DIR__ . '/Cores.php';
 require_once __DIR__ . '/Common.php';

@@ -11,5 +11,8 @@ declare(strict_types=1);
  * the LICENSE file that was distributed with this source code.
  */
 
-defined('HMVCSHIELDPATH')  || define('HMVCSHIELDPATH', 'Simpletine\\HMVCShield' . DIRECTORY_SEPARATOR);
-defined('HMVCSHIELDVIEWS') || define('HMVCSHIELDVIEWS', 'Simpletine\\HMVCShield\\Views' . DIRECTORY_SEPARATOR);
+defined('HMVCSHIELDPATH')    || define('HMVCSHIELDPATH', 'Simpletine\\HMVCShield' . DIRECTORY_SEPARATOR);
+defined('HMVCSHIELDVIEWS')   || define('HMVCSHIELDVIEWS', 'Simpletine\\HMVCShield\\Views' . DIRECTORY_SEPARATOR);
+defined('HMVCSHIELD_CONFIG') || define('HMVCSHIELD_CONFIG', 'Simpletine\\HMVCShield\\Config' . DIRECTORY_SEPARATOR);
+
+defined('WHITESPACE') || define('WHITESPACE', ' ');

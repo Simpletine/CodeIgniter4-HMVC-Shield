@@ -1,6 +1,26 @@
+<?php
+$config = stn_config('StnConfig');
+
+// Site settings
+$site_name              = $config->site_name ?? 'Portal';
+$site_url               = $config->site_name ?? '#';
+$site_route_to          = $config->site_route_to ?? 'admin';
+$site_anchor_attributes = $config->site_anchor_attributes ?? [];
+$site_logo_panel        = $config->site_logo_panel ?? [];
+$site_name_attributes   = $config->site_name_attributes ?? [];
+
+// Sidebar settings
+$sidebar_menu          = $config->sidebars;
+$sidebar_user_panel    = $config->sidebar_user_panel ?? [];
+$sidebar_search_panel  = $config->sidebar_search_panel ?? [];
+$sidebar_control_panel = $config->sidebar_control_panel ?? [];
+
+// Footer settings
+$footer = $config->footer;
+?>
 <!DOCTYPE html>
 <html lang="en">
-<?php include_once __DIR__ . '/header.php'; ?>
+<?php require_once __DIR__ . '/header.php'; ?>
 
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
@@ -151,38 +171,49 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
-            <a href="<?= route_to('admin') ?>" class="brand-link">
-                <img src="/assets/simpletine/img/AdminLTELogo.png" alt="AdminLTE Logo"
-                    class="brand-image img-circle elevation-3" style="opacity: .8">
-                <span class="brand-text font-weight-light">SimpleTine</span>
+            <a href="<?= route_to($site_route_to)?>" <?= stringify_attributes($site_anchor_attributes)?>>
+                <img <?= stringify_attributes($site_logo_panel)?>>
+                <span <?= stringify_attributes($site_name_attributes)?>><?= $site_name?></span>
             </a>
 
             <!-- Sidebar -->
             <div class="sidebar">
-                <!-- Sidebar user panel (optional) -->
+
+            <?php if(isset($sidebar_user_panel['show_panel']) && $sidebar_user_panel['show_panel'] === true) :?>
+                <!-- Sidebar user panel -->
+                 <?php
+                    if(isset($sidebar_user_panel['panel_html']) && ! empty($sidebar_user_panel['panel_html'])) {
+                        echo $sidebar_user_panel['panel_html'];
+                    } else {
+                        ?>
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <img src="/assets/simpletine/img/user2-160x160.jpg" class="img-circle elevation-2"
-                            alt="User Image">
+                        <img <?= stringify_attributes($sidebar_user_panel['panel_image'])?>>
                     </div>
                     <div class="info">
                         <a href="#" class="d-block"><?= username()?></a>
                     </div>
                 </div>
-
-                <!-- SidebarSearch Form -->
-                <div class="form-inline">
-                    <div class="input-group" data-widget="sidebar-search">
-                        <input class="form-control form-control-sidebar" type="search" placeholder="Search"
-                            aria-label="Search">
-                        <div class="input-group-append">
-                            <button class="btn btn-sidebar">
-                                <i class="fas fa-search fa-fw"></i>
-                            </button>
+                        <?php } endif;
+if(isset($sidebar_search_panel['show_panel']) && $sidebar_search_panel['show_panel'] === true): ?>
+                    <!-- SidebarSearch Form -->
+                    <?php
+if(isset($sidebar_search_panel['panel_html']) && ! empty($sidebar_search_panel['panel_html'])) {
+    echo $sidebar_search_panel['panel_html'];
+} else {
+    ?>
+                    <div class="form-inline">
+                        <div class="input-group" data-widget="sidebar-search">
+                            <input class="form-control form-control-sidebar" type="search" placeholder="Search"
+                                aria-label="Search">
+                            <div class="input-group-append">
+                                <button class="btn btn-sidebar">
+                                    <i <?=stringify_attributes($sidebar_search_panel['search_icon'])?>></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-
+                    <?php } endif; ?>
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
@@ -190,34 +221,35 @@
                         <!-- Add icons to the links using the .nav-icon class
                  with font-awesome or any other icon font library -->
                         <?php
-                    if ($stn_config = config('StnConfig.php')) {
-                        $sidebars = $stn_config->sidebars;
+            if (! empty($sidebar_menu) && is_array($sidebar_menu)) {
+                foreach ($sidebar_menu as $sidebar) {
+                    echo '<li ' . stringify_attributes($sidebar['attributes']) . '>';
+                    echo '<a ' . stringify_attributes($sidebar['anchor']) . '>';
+                    echo '<i class="nav-icon ' . ($sidebar['icon_class']) . '"></i>';
+                    if (array_key_exists('dropdown_items', $sidebar) && is_array($sidebar['dropdown_items'])) {
+                        echo '<p>' . ($sidebar['label']) . '<i class="right fas fa-angle-left"></i></p>';
+                        echo '</a>';
 
-                        foreach ($sidebars as $sidebar) {
+                        foreach ($sidebar['dropdown_items'] as $item) {
+                            echo '<ul class="nav nav-treeview">';
                             echo '<li ' . stringify_attributes($sidebar['attributes']) . '>';
-                            echo '<a ' . stringify_attributes($sidebar['anchor']) . '>';
-                            echo '<i class="nav-icon ' . ($sidebar['icon_class']) . '"></i>';
-                            if (array_key_exists('dropdown_items', $sidebar) && is_array($sidebar['dropdown_items'])) {
-                                echo '<p>' . ($sidebar['label']) . '<i class="right fas fa-angle-left"></i></p>';
-                                echo '</a>';
-
-                                foreach ($sidebar['dropdown_items'] as $item) {
-                                    echo '<ul class="nav nav-treeview">';
-                                    echo '<li ' . stringify_attributes($sidebar['attributes']) . '>';
-                                    echo '<a ' . stringify_attributes($item['anchor']) . '>';
-                                    echo '<i class="nav-icon ' . ($item['icon_class']) . '"></i>';
-                                    echo '<p>' . ($item['label']) . '</p>';
-                                    echo '</a>';
-                                    echo '</li>';
-                                    echo '</ul>';
-                                }
-                            } else {
-                                echo '<p>' . ($sidebar['label']) . '</p>';
-                                echo '</a>';
-                            }
+                            echo '<a ' . stringify_attributes($item['anchor']) . '>';
+                            echo '<i class="nav-icon ' . ($item['icon_class']) . '"></i>';
+                            echo '<p>' . ($item['label']) . '</p>';
+                            echo '</a>';
                             echo '</li>';
+                            echo '</ul>';
                         }
+                    } else {
+                        echo '<p>' . ($sidebar['label']) . '</p>';
+                        echo '</a>';
                     }
+                    echo '</li>';
+                }
+            } else {
+                // Rendering Custom HTML
+                echo $sidebars;
+            }
 ?>
                     </ul>
                 </nav>
@@ -252,7 +284,8 @@
                     <?php if (isset($contents) && is_array($contents)) :
                         foreach ($contents as $content) {
                             echo view($content);
-                        }  endif; ?>
+                        }
+                    endif; ?>
                     <!-- /.row -->
                 </div><!-- /.container-fluid -->
             </div>
@@ -260,7 +293,13 @@
         </div>
         <!-- /.content-wrapper -->
 
+        <?php if(isset($sidebar_control_panel->show_panel_sidebar) && $sidebar_control_panel->show_panel === true):?>
         <!-- Control Sidebar -->
+         <?php
+         if(isset($sidebar_control_panel->panel_html) && ! empty($sidebar_control_panel->panel_html)) {
+             echo $sidebar_control_panel->panel_html;
+         } else {
+             ?>
         <aside class="control-sidebar control-sidebar-dark">
             <!-- Control sidebar content goes here -->
             <div class="p-3">
@@ -268,18 +307,29 @@
                 <p>Sidebar content</p>
             </div>
         </aside>
+        <?php } endif; ?>
         <!-- /.control-sidebar -->
 
+        <?php
+if(isset($footer['show_footer']) && $footer['show_footer'] === true) :
+    ?>
         <!-- Main Footer -->
-        <footer class="main-footer">
+        <footer <?= stringify_attributes($footer['footer_attributes'])?>>
+            <?php
+    if(isset($footer['footer_html']) && ! empty($footer['footer_html'])) {
+        echo $footer['footer_html'];
+    } else {
+        ?>
             <!-- To the right -->
             <div class="float-right d-none d-sm-inline">
                 <?= last_login('Last Login: ') ?>
             </div>
             <!-- Default to the left -->
-            <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights
+            <strong>Copyright &copy; 2024 <a href="<?=$site_url?>"><?=$site_name?></a>.</strong> All rights
             reserved.
+            <?php } ?>
         </footer>
+        <?php endif; ?>
     </div>
     <!-- ./wrapper -->
 
@@ -309,7 +359,7 @@
 
     <!-- Script Files -->
     <?php if (isset($scripts) && is_array($scripts)) : ?>
-    <?php
+        <?php
         foreach ($scripts as $script) {
             echo view($script);
         }
