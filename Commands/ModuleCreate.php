@@ -13,16 +13,14 @@ declare(strict_types=1);
 
 namespace Simpletine\HMVCShield\Commands;
 
-use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
-use CodeIgniter\CLI\GeneratorTrait;
 
 /**
- * Generates a skeleton controller file.
+ * Generates a complete module structure with MVC files.
+ * Uses stored configuration for namespace patterns, class prefixes, and other preferences.
  */
-class ModuleCreate extends BaseCommand
+class ModuleCreate extends BaseModuleCommand
 {
-    use GeneratorTrait;
 
     /**
      * The Command's Group
@@ -71,9 +69,11 @@ class ModuleCreate extends BaseCommand
     ];
 
     /**
-     * Actually execute a command.
+     * Execute the command.
+     *
+     * @param array<string> $params
      */
-    public function run(array $params)
+    public function run(array $params): void
     {
         $moduleName = array_shift($params);
 
@@ -85,32 +85,11 @@ class ModuleCreate extends BaseCommand
             return;
         }
 
-        $mainFolder = 'Modules';
-        $this->createDirectory(APPPATH . $mainFolder, 'Modules Folder');
-
-        $moduleDirectory = APPPATH . "{$mainFolder}/{$moduleName}";
-        $this->createDirectory($moduleDirectory, "Module folder - {$moduleDirectory}");
-
+        $moduleDirectory = $this->ensureModuleDirectory($moduleName);
         $this->generateDirectories($moduleDirectory);
         $this->generateFiles($moduleDirectory, $moduleName);
 
-        CLI::write("Module \"{$moduleName}\" has been created.", 'green');
-    }
-
-    /**
-     * Creates a directory if it doesn't exist.
-     */
-    private function createDirectory(string $path, string $successMessage)
-    {
-        if (! is_dir($path)) {
-            if (mkdir($path, 0755, true)) {
-                CLI::write($successMessage, 'green');
-            } else {
-                CLI::error("{$successMessage} create failed, please create the folder manually or try again.");
-
-                exit;
-            }
-        }
+        CLI::write("Module \"{$moduleName}\" has been created successfully.", 'green');
     }
 
     /**
@@ -129,36 +108,42 @@ class ModuleCreate extends BaseCommand
     }
 
     /**
-     * Generates necessary files for the module.
+     * Generates necessary files for the module using stored configuration.
      */
-    private function generateFiles(string $directory, string $moduleName)
+    private function generateFiles(string $directory, string $moduleName): void
     {
         helper('inflector');
-        $className = pascalize($moduleName);
-        $isAdmin   = CLI::getOption('admin');
+        $className     = $this->buildClassName($moduleName);
+        $isAdmin       = CLI::getOption('admin') !== null;
+        $namespaceBase = $this->getNamespaceBase();
+        $controllersNs = $this->buildNamespace($moduleName, 'Controllers');
+        $modelsNs      = $this->buildNamespace($moduleName, 'Models');
+        $baseController = $this->getBaseController();
+        $baseModel      = $this->getBaseModel();
+        $tablePrefix    = $this->getTablePrefix();
 
         $templates = [
             $isAdmin ? 'controller.admin.tpl.php' : 'controller.tpl.php' => [
                 'path'         => "{$directory}/Controllers/Index.php",
                 'placeholders' => [
-                    '{namespace}'         => "App\\Modules\\{$moduleName}\\Controllers",
-                    '{useModelStatement}' => "App\\Modules\\{$moduleName}\\Models\\{$className}",
-                    '{useStatement}'      => 'App\Controllers\BaseController',
+                    '{namespace}'         => $controllersNs,
+                    '{useModelStatement}' => $modelsNs . '\\' . $className,
+                    '{useStatement}'      => $baseController,
                     '{class}'             => 'Index',
                     '{lowerClass}'        => 'index',
                     '{modelClass}'        => $className,
-                    '{extends}'           => 'BaseController',
+                    '{extends}'           => basename(str_replace('\\', '/', $baseController)),
                     '{directoryName}'     => $moduleName,
                 ],
             ],
             'model.tpl.php' => [
                 'path'         => "{$directory}/Models/{$className}.php",
                 'placeholders' => [
-                    '{namespace}'     => "App\\Modules\\{$moduleName}\\Models",
-                    '{useStatement}'  => 'CodeIgniter\Model',
+                    '{namespace}'     => $modelsNs,
+                    '{useStatement}'  => $baseModel,
                     '{class}'         => $className,
-                    '{table}'         => 'st_' . strtolower(underscore($moduleName)),
-                    '{extends}'       => 'Model',
+                    '{table}'         => $tablePrefix . strtolower(underscore($moduleName)),
+                    '{extends}'       => basename(str_replace('\\', '/', $baseModel)),
                     '{directoryName}' => $moduleName,
                 ],
             ],
@@ -172,38 +157,16 @@ class ModuleCreate extends BaseCommand
                 'path'         => "{$directory}/Config/Routes.php",
                 'placeholders' => [
                     '{groupName}' => strtolower(dasherize(underscore($moduleName))),
-                    '{namespace}' => "App\\Modules\\{$moduleName}\\Controllers",
+                    '{namespace}' => $controllersNs,
                 ],
             ],
         ];
 
         foreach ($templates as $template => $details) {
             $content = $this->getTemplate($template, $details['placeholders']);
-            file_put_contents($details['path'], $content);
+            if ($content !== '') {
+                file_put_contents($details['path'], $content);
+            }
         }
-    }
-
-    /**
-     * Loads a template and replaces placeholders.
-     *
-     * @param array<string, string> $placeholders
-     */
-    private function getTemplate(string $templateFile, array $placeholders): string
-    {
-        $templatePath = __DIR__ . DIRECTORY_SEPARATOR . 'Views' . DIRECTORY_SEPARATOR . $templateFile;
-
-        if (! file_exists($templatePath)) {
-            CLI::write("Template file not found: {$templateFile}, {$templatePath}", 'red');
-
-            return '';
-        }
-
-        $content = file_get_contents($templatePath);
-
-        foreach ($placeholders as $placeholder => $value) {
-            $content = str_replace($placeholder, $value, $content);
-        }
-
-        return str_replace('<@php', '<?php', $content);
     }
 }

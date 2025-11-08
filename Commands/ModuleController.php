@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace Simpletine\HMVCShield\Commands;
 
-use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
 
 /**
  * Generates a controller in the specified module.
+ * Uses stored configuration for namespace patterns and base controller class.
  */
-class ModuleController extends BaseCommand
+class ModuleController extends BaseModuleCommand
 {
     /**
      * The Command's Group
@@ -70,108 +70,95 @@ class ModuleController extends BaseCommand
 
     /**
      * Execute the command.
+     *
+     * @param array<string> $params
      */
-    public function run(array $params)
+    public function run(array $params): void
     {
-        helper('inflector');
+        $moduleName = array_shift($params);
+        $fileName   = array_shift($params);
 
-        $directoryMainFolder = 'Modules';
-        if (! is_dir(APPPATH . $directoryMainFolder)) {
-            if (mkdir(APPPATH . $directoryMainFolder, 0755, true)) {
-                CLI::write('Modules Folder created', 'green');
-            } else {
-                CLI::error('Modules Folder creation failed. Please create a new folder (Modules) inside APP or try again.');
+        if (! $moduleName || ! $fileName) {
+            CLI::error('Both module name and file name are required.');
+            $this->showHelp();
+
+            return;
+        }
+
+        $modulePath = $this->ensureModuleDirectory($moduleName);
+        $controllerDirectory = $modulePath . DIRECTORY_SEPARATOR . 'Controllers';
+
+        if (! is_dir($controllerDirectory)) {
+            if (! mkdir($controllerDirectory, 0755, true)) {
+                CLI::error("Failed to create Controllers directory for module: {$moduleName}");
 
                 return;
             }
         }
 
-        $directoryName = array_shift($params);
-        $fileName      = array_shift($params);
-        $isAdmin       = CLI::getOption('admin');
-
-        if (! $directoryName || ! $fileName) {
-            CLI::error('Both module name and file name are required.');
-
-            return;
-        }
-
-        $moduleDirectory = "{$directoryMainFolder}/{$directoryName}";
-        if (! is_dir(APPPATH . $moduleDirectory)) {
-            mkdir(APPPATH . $moduleDirectory, 0755, true);
-            CLI::write('Module folder created - ' . APPPATH . $moduleDirectory, 'green');
-        }
-
-        $controllerDirectory = APPPATH . $moduleDirectory . '/Controllers';
-        if (! is_dir($controllerDirectory)) {
-            mkdir($controllerDirectory, 0755, true);
-        }
-
-        $namespace      = str_replace('/', '\\', $moduleDirectory);
-        $className      = pascalize($fileName);
-        $templateFile   = $isAdmin ? 'controller.admin.tpl.php' : 'controller.new.tpl.php';
+        $isAdmin       = CLI::getOption('admin') !== null;
+        $className     = $this->buildClassName($fileName);
+        $templateFile  = $isAdmin ? 'controller.admin.tpl.php' : 'controller.new.tpl.php';
         $lowerClassName = strtolower($className);
+        $namespace     = $this->buildNamespace($moduleName, 'Controllers');
+        $modelsNs      = $this->buildNamespace($moduleName, 'Models');
+        $baseController = $this->getBaseController();
 
         $controllerTemplate = $this->getTemplate(
             $templateFile,
             [
-                '{namespace}'         => "App\\{$namespace}\\Controllers",
-                '{useModelStatement}' => "{$namespace}\\Models\\{$className}",
-                '{useStatement}'      => 'App\Controllers\BaseController',
+                '{namespace}'         => $namespace,
+                '{useModelStatement}' => $modelsNs . '\\' . $className,
+                '{useStatement}'      => $baseController,
                 '{class}'             => $className,
                 '{lowerClass}'        => $lowerClassName,
                 '{modelClass}'        => $className,
-                '{extends}'           => 'BaseController',
-                '{directoryName}'     => $directoryName,
+                '{extends}'           => basename(str_replace('\\', '/', $baseController)),
+                '{directoryName}'     => $moduleName,
             ]
         );
 
-        $controllerPath = APPPATH . $moduleDirectory . "/Controllers/{$className}.php";
+        if ($controllerTemplate === '') {
+            return;
+        }
+
+        $controllerPath = $controllerDirectory . DIRECTORY_SEPARATOR . "{$className}.php";
         if (! file_exists($controllerPath)) {
             file_put_contents($controllerPath, $controllerTemplate);
-            CLI::write("Controller '{$className}' created in module '{$directoryName}' using template '{$templateFile}'.", 'green');
+            CLI::write("Controller '{$className}' created in module '{$moduleName}'.", 'green');
         } else {
-            CLI::write("Controller '{$className}' already exists in module '{$directoryName}'.", 'yellow');
+            CLI::write("Controller '{$className}' already exists in module '{$moduleName}'.", 'yellow');
+
+            return;
         }
 
         if ($isAdmin) {
-            $viewTemplateFile = 'view.admin.tpl.php';
-            $viewTemplate     = $this->getTemplate(
-                $viewTemplateFile,
+            $viewsPath = $modulePath . DIRECTORY_SEPARATOR . 'Views';
+            if (! is_dir($viewsPath)) {
+                if (! mkdir($viewsPath, 0755, true)) {
+                    CLI::error("Failed to create Views directory for module: {$moduleName}");
+
+                    return;
+                }
+            }
+
+            $viewTemplate = $this->getTemplate(
+                'view.admin.tpl.php',
                 [
-                    '{directoryName}' => $directoryName,
+                    '{directoryName}' => $moduleName,
                 ]
             );
 
-            $viewPath = APPPATH . $moduleDirectory . "/Views/{$lowerClassName}.php";
-            if (! file_exists($viewPath)) {
-                file_put_contents($viewPath, $viewTemplate);
-                CLI::write("View '{$fileName}' created in module '{$directoryName}'.", 'green');
-            } else {
-                CLI::write("View '{$fileName}' already exists in module '{$directoryName}'.", 'yellow');
+            if ($viewTemplate !== '') {
+                $viewPath = $viewsPath . DIRECTORY_SEPARATOR . "{$lowerClassName}.php";
+                if (! file_exists($viewPath)) {
+                    file_put_contents($viewPath, $viewTemplate);
+                    CLI::write("View '{$fileName}' created in module '{$moduleName}'.", 'green');
+                } else {
+                    CLI::write("View '{$fileName}' already exists in module '{$moduleName}'.", 'yellow');
+                }
             }
         }
     }
 
-    /**
-     * Get the template content with placeholders replaced.
-     */
-    protected function getTemplate(string $templateFile, array $placeholders): string
-    {
-        $templatePath = __DIR__ . DIRECTORY_SEPARATOR . 'Views' . DIRECTORY_SEPARATOR . $templateFile;
-
-        if (! file_exists($templatePath)) {
-            CLI::write('Template file not found: ' . $templateFile, 'red');
-
-            return '';
-        }
-
-        $templateContent = file_get_contents($templatePath);
-
-        foreach ($placeholders as $placeholder => $value) {
-            $templateContent = str_replace($placeholder, $value, $templateContent);
-        }
-
-        return str_replace('<@php', '<?php', $templateContent);
-    }
 }

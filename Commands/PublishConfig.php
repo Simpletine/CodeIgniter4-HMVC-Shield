@@ -17,7 +17,8 @@ use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
 
 /**
- * Clones an existing module and renames it to a new module.
+ * Publishes the SimpleTine configuration file to the application's Config directory.
+ * Makes the StnConfig.php file available for application-level customization.
  */
 class PublishConfig extends BaseCommand
 {
@@ -65,8 +66,10 @@ class PublishConfig extends BaseCommand
 
     /**
      * Execute the command.
+     *
+     * @param array<string> $params
      */
-    public function run(array $params)
+    public function run(array $params): void
     {
         $sourcePath      = __DIR__ . '/../Config/StnConfig.php';
         $destinationPath = APPPATH . 'Config/StnConfig.php';
@@ -85,9 +88,10 @@ class PublishConfig extends BaseCommand
     }
 
     /**
-     * Recursively copy a directory.
+     * Recursively copies all files and directories from source to destination.
+     * Preserves directory structure during the copy operation.
      */
-    private function recursiveCopy(string $source, string $dest)
+    private function recursiveCopy(string $source, string $dest): void
     {
         $dir = opendir($source);
         @mkdir($dest);

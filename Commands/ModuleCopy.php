@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace Simpletine\HMVCShield\Commands;
 
-use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
 /**
- * Clones an existing module and renames it to a new module.
+ * Clones an existing module structure and renames all references to create a new module.
+ * Updates namespaces, class names, and route configurations in the copied module.
  */
-class ModuleCopy extends BaseCommand
+class ModuleCopy extends BaseModuleCommand
 {
     /**
      * The Command's Group
@@ -70,8 +70,10 @@ class ModuleCopy extends BaseCommand
 
     /**
      * Execute the command.
+     *
+     * @param array<string> $params
      */
-    public function run(array $params)
+    public function run(array $params): void
     {
         helper('inflector');
 
@@ -85,8 +87,9 @@ class ModuleCopy extends BaseCommand
             return;
         }
 
-        $sourceDir = APPPATH . "Modules/{$oldModule}";
-        $destDir   = APPPATH . "Modules/{$newModule}";
+        $modulesDir = $this->getModulesDirectory();
+        $sourceDir  = APPPATH . "{$modulesDir}/{$oldModule}";
+        $destDir    = APPPATH . "{$modulesDir}/{$newModule}";
 
         if (! is_dir($sourceDir)) {
             CLI::error("Source module '{$oldModule}' does not exist.");
@@ -108,9 +111,10 @@ class ModuleCopy extends BaseCommand
     }
 
     /**
-     * Recursively copy a directory.
+     * Recursively copies all files and directories from source to destination.
+     * Preserves directory structure during the copy operation.
      */
-    private function recursiveCopy(string $source, string $dest)
+    private function recursiveCopy(string $source, string $dest): void
     {
         $directoryIterator = new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS);
         $iterator          = new RecursiveIteratorIterator($directoryIterator, RecursiveIteratorIterator::SELF_FIRST);
@@ -126,9 +130,10 @@ class ModuleCopy extends BaseCommand
     }
 
     /**
-     * Replace placeholders in copied files.
+     * Replaces module name references throughout all files in the copied module.
+     * Updates class names, namespaces, and route configurations to match the new module name.
      */
-    private function replacePlaceholders(string $directory, string $oldModule, string $newModule)
+    private function replacePlaceholders(string $directory, string $oldModule, string $newModule): void
     {
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory));
 
@@ -157,9 +162,9 @@ class ModuleCopy extends BaseCommand
     }
 
     /**
-     * Rename the model file if necessary.
+     * Renames the model file to match the new module name convention.
      */
-    private function renameModelFile(string $directory, string $oldModule, string $newModule)
+    private function renameModelFile(string $directory, string $oldModule, string $newModule): void
     {
         $oldModelFile = "{$directory}/Models/" . pascalize($oldModule) . '.php';
         $newModelFile = "{$directory}/Models/" . pascalize($newModule) . '.php';

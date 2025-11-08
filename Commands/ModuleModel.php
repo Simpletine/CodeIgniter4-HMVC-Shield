@@ -13,10 +13,13 @@ declare(strict_types=1);
 
 namespace Simpletine\HMVCShield\Commands;
 
-use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
 
-class ModuleModel extends BaseCommand
+/**
+ * Generates a model in the specified module.
+ * Uses stored configuration for namespace patterns, table prefixes, and base model class.
+ */
+class ModuleModel extends BaseModuleCommand
 {
     /**
      * The Command's Group
@@ -65,83 +68,66 @@ class ModuleModel extends BaseCommand
 
     /**
      * Execute the command.
+     *
+     * @param array<string> $params
      */
-    public function run(array $params)
+    public function run(array $params): void
     {
-        helper('inflector');
+        $moduleName = array_shift($params);
+        $fileName   = array_shift($params);
 
-        $directoryMainFolder = 'Modules';
-        if (! is_dir(APPPATH . $directoryMainFolder)) {
-            if (mkdir(APPPATH . $directoryMainFolder, 0755, true)) {
-                CLI::write('Modules Folder created', 'green');
-            } else {
-                CLI::error('Modules Folder creation failed. Please create a new folder (Modules) inside APP or try again.');
+        if (! $moduleName || ! $fileName) {
+            CLI::error('Both module name and file name are required.');
+            $this->showHelp();
+
+            return;
+        }
+
+        $modulePath = $this->ensureModuleDirectory($moduleName);
+        $modelDirectory = $modulePath . DIRECTORY_SEPARATOR . 'Models';
+
+        if (! is_dir($modelDirectory)) {
+            if (! mkdir($modelDirectory, 0755, true)) {
+                CLI::error("Failed to create Models directory for module: {$moduleName}");
 
                 return;
             }
         }
 
-        $directoryName = array_shift($params);
-        $fileName      = array_shift($params);
-
-        if (! $directoryName || ! $fileName) {
-            CLI::error('Both module name and file name are required.');
-
-            return;
-        }
-
-        $moduleDirectory = "{$directoryMainFolder}/{$directoryName}";
-        if (! is_dir(APPPATH . $moduleDirectory)) {
-            mkdir(APPPATH . $moduleDirectory, 0755, true);
-            CLI::write('Module folder created - ' . APPPATH . $moduleDirectory, 'green');
-        }
-
-        $modelDirectory = APPPATH . $moduleDirectory . '/Models';
-        if (! is_dir($modelDirectory)) {
-            mkdir($modelDirectory, 0755, true);
-        }
-
-        $namespace = str_replace('/', '\\', $moduleDirectory);
-        $className = pascalize($fileName . 'Model');
-        $tableName = 'st_' . strtolower(underscore($fileName));
+        helper('inflector');
+        $className   = $this->buildClassName($fileName, 'Model');
+        $namespace   = $this->buildNamespace($moduleName, 'Models');
+        $tablePrefix = $this->getTablePrefix();
+        $baseModel   = $this->getBaseModel();
+        $tableName   = $tablePrefix . strtolower(underscore($fileName));
 
         $modelTemplate = $this->getTemplate(
             'model.tpl.php',
             [
-                '{namespace}'     => "{$namespace}\\Models",
-                '{useStatement}'  => 'CodeIgniter\Model',
+                '{namespace}'     => $namespace,
+                '{useStatement}'  => $baseModel,
                 '{class}'         => $className,
                 '{table}'         => $tableName,
-                '{extends}'       => 'Model',
-                '{directoryName}' => $directoryName,
+                '{extends}'       => basename(str_replace('\\', '/', $baseModel)),
+                '{directoryName}' => $moduleName,
             ]
         );
 
-        $modelPath = APPPATH . $moduleDirectory . "/Models/{$className}.php";
-        file_put_contents($modelPath, $modelTemplate);
-
-        CLI::write("Model '{$className}' created in module '{$directoryName}'.", 'green');
-    }
-
-    /**
-     * Get the template content with placeholders replaced.
-     */
-    protected function getTemplate(string $templateFile, array $placeholders): string
-    {
-        $templatePath = __DIR__ . DIRECTORY_SEPARATOR . 'Views' . DIRECTORY_SEPARATOR . $templateFile;
-
-        if (! file_exists($templatePath)) {
-            CLI::write('Template file not found: ' . $templateFile, 'red');
-
-            return '';
+        if ($modelTemplate === '') {
+            return;
         }
 
-        $templateContent = file_get_contents($templatePath);
+        $modelPath = $modelDirectory . DIRECTORY_SEPARATOR . "{$className}.php";
+        if (file_exists($modelPath)) {
+            CLI::write("Model '{$className}' already exists in module '{$moduleName}'.", 'yellow');
 
-        foreach ($placeholders as $placeholder => $value) {
-            $templateContent = str_replace($placeholder, $value, $templateContent);
+            return;
         }
 
-        return str_replace('<@php', '<?php', $templateContent);
+        if (file_put_contents($modelPath, $modelTemplate) !== false) {
+            CLI::write("Model '{$className}' created in module '{$moduleName}'.", 'green');
+        } else {
+            CLI::error("Failed to create model '{$className}' in module '{$moduleName}'.");
+        }
     }
 }

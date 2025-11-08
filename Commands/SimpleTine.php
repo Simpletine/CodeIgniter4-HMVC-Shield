@@ -62,31 +62,16 @@ class SimpleTine extends BaseCommand
 
     /**
      * Execute the command.
+     *
+     * @param array<string> $params
      */
-    public function run(array $params)
+    public function run(array $params): void
     {
-        CLI::newLine(3);
-
-        $asciiArt = <<<'EOT'
-            ====================================================================================================================
-
-                 _       __     __                             ______         _____ _                 __   _______
-                | |     / /__  / /________  ____ ___  ___     /_  __/___     / ___/(_)___ ___  ____  / /__/_  __(_)___  ___
-                | | /| / / _ \/ / ___/ __ \/ __ `__ \/ _ \     / / / __ \    \__ \/ / __ `__ \/ __ \/ / _ \/ / / / __ \/ _ \
-                | |/ |/ /  __/ / /__/ /_/ / / / / / /  __/    / / / /_/ /   ___/ / / / / / / / /_/ / /  __/ / / / / / /  __/
-                |__/|__/\___/_/\___/\____/_/ /_/ /_/\___/    /_/  \____/   /____/_/_/ /_/ /_/ .___/_/\___/_/ /_/_/ /_/\___/
-                                                                                           /_/
-
-            ====================================================================================================================
-            EOT;
-
-        CLI::write($asciiArt, 'yellow');
-        CLI::newLine(3);
-
+        CLI::newLine();
         CLI::write('-------------------------------------', 'cyan');
         CLI::write('Commands available and functionality:', 'cyan');
         CLI::write('-------------------------------------', 'cyan');
-        CLI::newLine(1);
+        CLI::newLine();
 
         CLI::write('For General Module', 'yellow');
         CLI::write('php spark module:create Blogs', 'blue');
