@@ -55,10 +55,10 @@ class ModuleRoute extends BaseModuleCommand
      * @var array<string, string>
      */
     protected $arguments = [
-        'module'          => 'The name of the module',
-        'action'          => 'Action: add, list, or remove',
-        'route_path'     => 'The route path (e.g., "new", "edit/:id")',
-        'controller_method' => 'Controller and method (e.g., "Blogs::create")',
+        'module'            => 'The name of the module',
+        'action'            => 'Action: add, list, remove, publish, unpublish',
+        'route_path'        => 'The route path (e.g., "new", "edit/:id") — required for add/remove',
+        'controller_method' => 'Controller and method (e.g., "Blogs::create") — required for add',
     ];
 
     /**
@@ -73,7 +73,7 @@ class ModuleRoute extends BaseModuleCommand
     /**
      * Execute the command.
      *
-     * @param array<string> $params
+     * @param list<string> $params
      */
     public function run(array $params): void
     {
@@ -83,6 +83,18 @@ class ModuleRoute extends BaseModuleCommand
         if (! $moduleName || ! $action) {
             CLI::error('Module name and action are required.');
             $this->showHelp();
+
+            return;
+        }
+
+        $action = strtolower($action);
+
+        // Sidebar-only actions: do not require a Routes.php file
+        if (in_array($action, ['publish', 'unpublish'], true)) {
+            match ($action) {
+                'publish'   => $this->publishSidebar($moduleName),
+                'unpublish' => $this->unpublishSidebar($moduleName),
+            };
 
             return;
         }
@@ -105,12 +117,11 @@ class ModuleRoute extends BaseModuleCommand
             $this->createInitialRoutesFile($routesFile, $moduleName);
         }
 
-        $action = strtolower($action);
         match ($action) {
             'add'    => $this->addRoute($routesFile, $moduleName, $params),
             'list'   => $this->listRoutes($routesFile, $moduleName),
             'remove' => $this->removeRoute($routesFile, $moduleName, $params),
-            default  => CLI::error("Unknown action: {$action}. Use: add, list, or remove"),
+            default  => CLI::error("Unknown action: {$action}. Use: add, list, remove, publish, unpublish"),
         };
     }
 
@@ -135,11 +146,11 @@ class ModuleRoute extends BaseModuleCommand
     /**
      * Adds a route to the module's Routes.php file.
      *
-     * @param array<string> $params
+     * @param list<string> $params
      */
     private function addRoute(string $routesFile, string $moduleName, array $params): void
     {
-        $routePath = array_shift($params);
+        $routePath        = array_shift($params);
         $controllerMethod = array_shift($params);
 
         if (! $routePath || ! $controllerMethod) {
@@ -160,7 +171,7 @@ class ModuleRoute extends BaseModuleCommand
         }
 
         // Check if route already exists
-        if (strpos($content, "'{$routePath}'") !== false || strpos($content, "\"{$routePath}\"") !== false) {
+        if (str_contains($content, "'{$routePath}'") || str_contains($content, "\"{$routePath}\"")) {
             CLI::write("Route '{$routePath}' already exists in module '{$moduleName}'.", 'yellow');
 
             return;
@@ -175,7 +186,7 @@ class ModuleRoute extends BaseModuleCommand
         }
 
         // Build route line
-        $routeLine = "        \$routes->{$httpMethod}('{$routePath}', '{$controllerMethod}');\n";
+        $routeLine  = "        \$routes->{$httpMethod}('{$routePath}', '{$controllerMethod}');\n";
         $newContent = substr_replace($content, $routeLine . '    ', $insertPosition, 0);
 
         if (file_put_contents($routesFile, $newContent) !== false) {
@@ -221,7 +232,7 @@ class ModuleRoute extends BaseModuleCommand
     /**
      * Removes a route from the module's Routes.php file.
      *
-     * @param array<string> $params
+     * @param list<string> $params
      */
     private function removeRoute(string $routesFile, string $moduleName, array $params): void
     {
@@ -241,7 +252,7 @@ class ModuleRoute extends BaseModuleCommand
         }
 
         // Remove route line
-        $pattern = '/\s*\$routes->\w+\s*\([\'"]' . preg_quote($routePath, '/') . '[\'"],\s*[\'"][^\'"]+[\'"]\);\s*\n/';
+        $pattern    = '/\s*\$routes->\w+\s*\([\'"]' . preg_quote($routePath, '/') . '[\'"],\s*[\'"][^\'"]+[\'"]\);\s*\n/';
         $newContent = preg_replace($pattern, '', $content);
 
         if ($newContent === $content) {
@@ -257,4 +268,3 @@ class ModuleRoute extends BaseModuleCommand
         }
     }
 }
-

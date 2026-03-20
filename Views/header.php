@@ -18,7 +18,7 @@
 
     <!-- CSS Files -->
     <?php if (isset($css) && is_array($css)) {
-        foreach($css as $file) {
+        foreach ($css as $file) {
             echo '<link rel="stylesheet" href="' . $file . '">';
         }
     } ?>

@@ -71,7 +71,7 @@ class ModuleCopy extends BaseModuleCommand
     /**
      * Execute the command.
      *
-     * @param array<string> $params
+     * @param list<string> $params
      */
     public function run(array $params): void
     {
@@ -148,7 +148,7 @@ class ModuleCopy extends BaseModuleCommand
                 $contents = str_ireplace(
                     [$oldModule, $oldModuleCamel, $oldModulePlural],
                     [$newModule, $newModuleCamel, $newModulePlural],
-                    $contents
+                    $contents,
                 );
 
                 // Special handling for Routes.php file

@@ -63,7 +63,7 @@ class SimpleTine extends BaseCommand
     /**
      * Execute the command.
      *
-     * @param array<string> $params
+     * @param list<string> $params
      */
     public function run(array $params): void
     {

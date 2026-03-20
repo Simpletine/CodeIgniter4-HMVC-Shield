@@ -71,7 +71,7 @@ class ModuleController extends BaseModuleCommand
     /**
      * Execute the command.
      *
-     * @param array<string> $params
+     * @param list<string> $params
      */
     public function run(array $params): void
     {
@@ -85,7 +85,7 @@ class ModuleController extends BaseModuleCommand
             return;
         }
 
-        $modulePath = $this->ensureModuleDirectory($moduleName);
+        $modulePath          = $this->ensureModuleDirectory($moduleName);
         $controllerDirectory = $modulePath . DIRECTORY_SEPARATOR . 'Controllers';
 
         if (! is_dir($controllerDirectory)) {
@@ -96,12 +96,12 @@ class ModuleController extends BaseModuleCommand
             }
         }
 
-        $isAdmin       = CLI::getOption('admin') !== null;
-        $className     = $this->buildClassName($fileName);
-        $templateFile  = $isAdmin ? 'controller.admin.tpl.php' : 'controller.new.tpl.php';
+        $isAdmin        = CLI::getOption('admin') !== null;
+        $className      = $this->buildClassName($fileName);
+        $templateFile   = $isAdmin ? 'controller.admin.tpl.php' : 'controller.new.tpl.php';
         $lowerClassName = strtolower($className);
-        $namespace     = $this->buildNamespace($moduleName, 'Controllers');
-        $modelsNs      = $this->buildNamespace($moduleName, 'Models');
+        $namespace      = $this->buildNamespace($moduleName, 'Controllers');
+        $modelsNs       = $this->buildNamespace($moduleName, 'Models');
         $baseController = $this->getBaseController();
 
         $controllerTemplate = $this->getTemplate(
@@ -115,7 +115,7 @@ class ModuleController extends BaseModuleCommand
                 '{modelClass}'        => $className,
                 '{extends}'           => basename(str_replace('\\', '/', $baseController)),
                 '{directoryName}'     => $moduleName,
-            ]
+            ],
         );
 
         if ($controllerTemplate === '') {
@@ -146,7 +146,7 @@ class ModuleController extends BaseModuleCommand
                 'view.admin.tpl.php',
                 [
                     '{directoryName}' => $moduleName,
-                ]
+                ],
             );
 
             if ($viewTemplate !== '') {
@@ -160,5 +160,4 @@ class ModuleController extends BaseModuleCommand
             }
         }
     }
-
 }

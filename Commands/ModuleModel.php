@@ -69,7 +69,7 @@ class ModuleModel extends BaseModuleCommand
     /**
      * Execute the command.
      *
-     * @param array<string> $params
+     * @param list<string> $params
      */
     public function run(array $params): void
     {
@@ -83,7 +83,7 @@ class ModuleModel extends BaseModuleCommand
             return;
         }
 
-        $modulePath = $this->ensureModuleDirectory($moduleName);
+        $modulePath     = $this->ensureModuleDirectory($moduleName);
         $modelDirectory = $modulePath . DIRECTORY_SEPARATOR . 'Models';
 
         if (! is_dir($modelDirectory)) {
@@ -110,7 +110,7 @@ class ModuleModel extends BaseModuleCommand
                 '{table}'         => $tableName,
                 '{extends}'       => basename(str_replace('\\', '/', $baseModel)),
                 '{directoryName}' => $moduleName,
-            ]
+            ],
         );
 
         if ($modelTemplate === '') {

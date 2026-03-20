@@ -30,14 +30,14 @@ class ConfigStorage
      * @var array<string, mixed>
      */
     private array $defaultConfig = [
-        'namespace_base'     => 'App\\Modules',
-        'class_prefix'       => '',
-        'table_prefix'       => 'st_',
-        'modules_directory'  => 'Modules',
-        'base_controller'    => 'App\\Controllers\\BaseController',
-        'base_model'         => 'CodeIgniter\\Model',
-        'created_at'         => null,
-        'updated_at'         => null,
+        'namespace_base'    => 'App\\Modules',
+        'class_prefix'      => '',
+        'table_prefix'      => 'st_',
+        'modules_directory' => 'Modules',
+        'base_controller'   => 'App\\Controllers\\BaseController',
+        'base_model'        => 'CodeIgniter\\Model',
+        'created_at'        => null,
+        'updated_at'        => null,
     ];
 
     public function __construct()
@@ -116,13 +116,11 @@ class ConfigStorage
 
     /**
      * Sets a specific configuration value and saves.
-     *
-     * @param mixed $value
      */
     public function set(string $key, mixed $value): bool
     {
-        $config         = $this->load();
-        $config[$key]   = $value;
+        $config               = $this->load();
+        $config[$key]         = $value;
         $config['updated_at'] = date('Y-m-d H:i:s');
 
         return $this->save($config);
@@ -136,4 +134,3 @@ class ConfigStorage
         return $this->save($this->defaultConfig);
     }
 }
-

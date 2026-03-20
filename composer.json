@@ -25,17 +25,17 @@
         ]
     },
     "require": {
-        "php": "^7.4 || ^8.0",
-        "codeigniter4/framework": "^4.0",
-        "codeigniter4/shield": "dev-develop"
+        "php": "^8.2",
+        "codeigniter4/framework": "^4.4",
+        "codeigniter4/shield": "^1.1"
     },
     "require-dev": {
         "codeigniter/coding-standard": "^1.7",
-        "fakerphp/faker": "^1.23.1",
+        "fakerphp/faker": "^1.23",
         "mikey179/vfsstream": "^1.6",
-        "phpstan/phpstan": "2.0.x-dev",
-        "phpunit/phpunit": "^9.1",
-        "squizlabs/php_codesniffer": "*"
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^10.5",
+        "squizlabs/php_codesniffer": "^3.9"
     },
     "scripts": {
         "test": "phpunit",

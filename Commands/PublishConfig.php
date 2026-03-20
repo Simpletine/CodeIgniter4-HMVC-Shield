@@ -18,7 +18,7 @@ use CodeIgniter\CLI\CLI;
 
 /**
  * Publishes the SimpleTine configuration file to the application's Config directory.
- * Makes the StnConfig.php file available for application-level customization.
+ * Publishes: StnConfig.php, HMVCPaths.php, MigrationPaths.php
  */
 class PublishConfig extends BaseCommand
 {
@@ -41,55 +41,80 @@ class PublishConfig extends BaseCommand
      *
      * @var string
      */
-    protected $description = 'Publishes the StnConfig to APPPATH Config folder.';
+    protected $description = 'Publishes SimpleTine config files (StnConfig, HMVCPaths, MigrationPaths) to app/Config/.';
 
     /**
-     * The Command's Usage
-     *
      * @var string
      */
-    protected $usage = 'publish:assets';
+    protected $usage = 'publish:config [--force]';
 
     /**
-     * The Command's Arguments
-     *
      * @var array<string, string>
      */
     protected $arguments = [];
 
     /**
-     * The Command's Options
+     * @var array<string, string>
+     */
+    protected $options = [
+        '--force' => 'Overwrite existing config files without prompting',
+    ];
+
+    /**
+     * Config files to publish: source (relative to package Config/) => destination class name.
      *
      * @var array<string, string>
      */
-    protected $options = [];
+    private array $configFiles = [
+        'StnConfig.php'      => 'StnConfig.php',
+        'Paths.php'          => 'HMVCPaths.php',
+        'MigrationPaths.php' => 'MigrationPaths.php',
+    ];
 
     /**
      * Execute the command.
      *
-     * @param array<string> $params
+     * @param list<string> $params
      */
     public function run(array $params): void
     {
-        $sourcePath      = __DIR__ . '/../Config/StnConfig.php';
-        $destinationPath = APPPATH . 'Config/StnConfig.php';
+        $force = CLI::getOption('force') !== null;
 
-        if (! file_exists($sourcePath)) {
-            CLI::error('Source file not found: ' . $sourcePath);
+        CLI::write('Publishing config files to: ' . APPPATH . 'Config/', 'cyan');
+        CLI::newLine();
 
-            return;
+        foreach ($this->configFiles as $sourceFile => $destFile) {
+            $sourcePath = __DIR__ . '/../Config/' . $sourceFile;
+            $destPath   = APPPATH . 'Config/' . $destFile;
+
+            if (! file_exists($sourcePath)) {
+                CLI::error("  Source not found: {$sourcePath}");
+
+                continue;
+            }
+
+            if (file_exists($destPath) && ! $force) {
+                $overwrite = CLI::prompt("  {$destFile} already exists. Overwrite?", ['y', 'n']);
+                if (strtolower($overwrite) !== 'y') {
+                    CLI::write("  Skipped: {$destFile}", 'yellow');
+
+                    continue;
+                }
+            }
+
+            if (copy($sourcePath, $destPath)) {
+                CLI::write("  Published: {$destFile}", 'green');
+            } else {
+                CLI::error("  Failed: {$destFile}");
+            }
         }
 
-        if (copy($sourcePath, $destinationPath)) {
-            CLI::write('Config successfully publish to: ' . $destinationPath, 'green');
-        } else {
-            CLI::error('Failed to publish the config file.');
-        }
+        CLI::newLine();
+        CLI::write('Done. Customise any published config in app/Config/.', 'green');
     }
 
     /**
      * Recursively copies all files and directories from source to destination.
-     * Preserves directory structure during the copy operation.
      */
     private function recursiveCopy(string $source, string $dest): void
     {

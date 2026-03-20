@@ -15,6 +15,8 @@ namespace Simpletine\HMVCShield\Commands;
 
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
+use Exception;
+use Throwable;
 
 /**
  * Sets up SimpleTine HMVC environment with configuration collection and storage.
@@ -63,9 +65,9 @@ class SimpleTineSetup extends BaseCommand
      * @var array<string, string>
      */
     protected $options = [
-        '--skip-config' => 'Skip configuration collection and use existing or defaults',
-        '--skip-db'     => 'Skip database creation step',
-        '--skip-shield' => 'Skip Shield installation step',
+        '--skip-config'  => 'Skip configuration collection and use existing or defaults',
+        '--skip-db'      => 'Skip database creation step',
+        '--skip-shield'  => 'Skip Shield installation step',
         '--only-publish' => 'Only execute publish steps (assets, views, config)',
     ];
 
@@ -89,7 +91,7 @@ class SimpleTineSetup extends BaseCommand
     /**
      * Execute the command.
      *
-     * @param array<string> $params
+     * @param list<string> $params
      */
     public function run(array $params): void
     {
@@ -100,8 +102,8 @@ class SimpleTineSetup extends BaseCommand
         CLI::newLine();
 
         $onlyPublish = CLI::getOption('only-publish') !== null;
-        $skipDb     = CLI::getOption('skip-db') !== null;
-        $skipShield = CLI::getOption('skip-shield') !== null;
+        $skipDb      = CLI::getOption('skip-db') !== null;
+        $skipShield  = CLI::getOption('skip-shield') !== null;
 
         if ($onlyPublish) {
             // Only execute publish steps
@@ -128,12 +130,20 @@ class SimpleTineSetup extends BaseCommand
                 CLI::write('Skipping Shield installation (--skip-shield).', 'yellow');
             }
 
+            // Scaffold the default 'users' module with admin CRUD
+            $this->executeScaffoldUsers();
+
             // Publish assets, views, and config
             $this->executePublishSteps();
         }
 
         CLI::newLine();
         CLI::write('SimpleTine setup completed successfully!', 'green');
+        CLI::write('', 'white');
+        CLI::write('Default login credentials:', 'cyan');
+        CLI::write('  Email   : super@admin.com', 'white');
+        CLI::write('  Password: password', 'white');
+        CLI::write('  (Change these immediately after first login!)', 'yellow');
         CLI::newLine();
     }
 
@@ -173,32 +183,32 @@ class SimpleTineSetup extends BaseCommand
         $namespaceBase = $this->promptWithDefault(
             'Namespace base for modules',
             'App\\Modules',
-            fn ($value) => $this->validateNamespace($value, 'Namespace base must be a valid namespace (e.g., App\\Modules)')
+            fn ($value) => $this->validateNamespace($value, 'Namespace base must be a valid namespace (e.g., App\\Modules)'),
         );
-        $classPrefix  = $this->promptWithDefault(
+        $classPrefix = $this->promptWithDefault(
             'Class prefix (optional, press Enter to skip)',
             '',
-            fn ($value) => $value === '' || $this->validateClassName($value, 'Class prefix must be a valid class name')
+            fn ($value) => $value === '' || $this->validateClassName($value, 'Class prefix must be a valid class name'),
         );
-        $tablePrefix  = $this->promptWithDefault(
+        $tablePrefix = $this->promptWithDefault(
             'Database table prefix',
             'st_',
-            fn ($value) => $this->validateTablePrefix($value, 'Table prefix must contain only letters, numbers, and underscores')
+            fn ($value) => $this->validateTablePrefix($value, 'Table prefix must contain only letters, numbers, and underscores'),
         );
-        $modulesDir   = $this->promptWithDefault(
+        $modulesDir = $this->promptWithDefault(
             'Modules directory name',
             'Modules',
-            fn ($value) => $this->validateDirectoryName($value, 'Directory name must be a valid directory name')
+            fn ($value) => $this->validateDirectoryName($value, 'Directory name must be a valid directory name'),
         );
         $baseController = $this->promptWithDefault(
             'Base controller class',
             'App\\Controllers\\BaseController',
-            fn ($value) => $this->validateNamespace($value, 'Base controller must be a valid class name with namespace')
+            fn ($value) => $this->validateNamespace($value, 'Base controller must be a valid class name with namespace'),
         );
-        $baseModel     = $this->promptWithDefault(
+        $baseModel = $this->promptWithDefault(
             'Base model class',
             'CodeIgniter\\Model',
-            fn ($value) => $this->validateNamespace($value, 'Base model must be a valid class name with namespace')
+            fn ($value) => $this->validateNamespace($value, 'Base model must be a valid class name with namespace'),
         );
 
         $config = [
@@ -225,6 +235,7 @@ class SimpleTineSetup extends BaseCommand
      * Repeats the prompt if validation fails.
      *
      * @param callable|null $validator Optional validation function that returns true if valid, or error message string if invalid
+     *
      * @return string The user input or default value if empty
      */
     private function promptWithDefault(string $label, string $default, ?callable $validator = null): string
@@ -248,6 +259,7 @@ class SimpleTineSetup extends BaseCommand
                 // $result contains error message
                 CLI::error($result);
                 CLI::newLine();
+
                 continue;
             }
 
@@ -266,7 +278,7 @@ class SimpleTineSetup extends BaseCommand
         }
 
         // Should contain at least one backslash for namespace
-        if (strpos($value, '\\') === false) {
+        if (! str_contains($value, '\\')) {
             return $errorMessage;
         }
 
@@ -315,6 +327,35 @@ class SimpleTineSetup extends BaseCommand
     }
 
     /**
+     * Scaffolds the default 'users' HMVC module with admin CRUD boilerplate.
+     * Replaces the legacy 'members' module from earlier versions.
+     */
+    private function executeScaffoldUsers(): void
+    {
+        CLI::write('=== Scaffolding Users Module ===', 'cyan');
+        CLI::newLine();
+
+        $scaffold = CLI::prompt('Do you want to scaffold the default Users CRUD module?', ['y', 'n']);
+        if (strtolower($scaffold) !== 'y') {
+            CLI::write('Skipping Users module scaffold.', 'yellow');
+
+            return;
+        }
+
+        try {
+            $this->call('module:create', ['users', '--admin']);
+            CLI::write('Users module created successfully.', 'green');
+            CLI::write('  Path  : app/' . (config('HMVCPaths')->modulesDirectory ?? 'Modules') . '/users', 'white');
+            CLI::write('  Route : /users', 'white');
+        } catch (Throwable $e) {
+            CLI::error("Failed to scaffold Users module: {$e->getMessage()}");
+            CLI::write('You can scaffold it manually: php spark module:create users --admin', 'yellow');
+        }
+
+        CLI::newLine();
+    }
+
+    /**
      * Executes database setup step with error handling.
      */
     private function executeDatabaseSetup(): void
@@ -323,10 +364,11 @@ class SimpleTineSetup extends BaseCommand
         if (strtolower($createDatabase) === 'y') {
             $databaseName = CLI::prompt('Enter the database name');
             CLI::write("Creating database '{$databaseName}'...", 'green');
+
             try {
                 $this->call('db:create', [$databaseName]);
                 CLI::write("Database '{$databaseName}' created successfully.", 'green');
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 CLI::error("Failed to create database: {$e->getMessage()}");
                 CLI::write('You can retry this step later or create the database manually.', 'yellow');
                 CLI::newLine();
@@ -344,10 +386,11 @@ class SimpleTineSetup extends BaseCommand
         $shieldConfirmation = CLI::prompt('Do you want to install Shield?', ['y', 'n']);
         if (strtolower($shieldConfirmation) === 'y') {
             CLI::write('Running Shield setup...', 'green');
+
             try {
                 $this->call('shield:setup');
                 CLI::write('Shield setup completed.', 'green');
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 CLI::error("Shield setup failed: {$e->getMessage()}");
                 CLI::write('You can retry this step later by running: php spark shield:setup', 'yellow');
                 CLI::newLine();
@@ -380,10 +423,11 @@ class SimpleTineSetup extends BaseCommand
 
         foreach ($steps as $stepName => $command) {
             CLI::write("Publishing {$stepName}...", 'green');
+
             try {
                 $this->call($command);
                 CLI::write("{$stepName} published successfully.", 'green');
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 CLI::error("Failed to publish {$stepName}: {$e->getMessage()}");
                 $failedSteps[] = $stepName;
             }
@@ -393,12 +437,14 @@ class SimpleTineSetup extends BaseCommand
         if (! empty($failedSteps)) {
             CLI::newLine();
             CLI::write('Some publish steps failed:', 'yellow');
+
             foreach ($failedSteps as $step) {
                 CLI::write("  - {$step}", 'yellow');
             }
             CLI::newLine();
             CLI::write('To retry failed steps, you can:', 'cyan');
             CLI::write('  1. Run individual commands:', 'white');
+
             foreach ($failedSteps as $step) {
                 CLI::write("     php spark {$steps[$step]}", 'white');
             }

@@ -15,6 +15,7 @@ namespace Simpletine\HMVCShield\Commands;
 
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
+use Exception;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
@@ -73,7 +74,7 @@ class PublishAssets extends BaseCommand
     /**
      * Execute the command.
      *
-     * @param array<string> $params
+     * @param list<string> $params
      */
     public function run(array $params): void
     {
@@ -120,7 +121,7 @@ class PublishAssets extends BaseCommand
     /**
      * Gets the destination path from user input or command parameter.
      *
-     * @param array<string> $params
+     * @param list<string> $params
      */
     private function getDestinationPath(array $params): string
     {
@@ -133,9 +134,7 @@ class PublishAssets extends BaseCommand
         }
 
         // Remove leading/trailing slashes and normalize
-        $destinationPath = trim($destinationPath, '/\\');
-
-        return $destinationPath;
+        return trim($destinationPath, '/\\');
     }
 
     /**
@@ -157,7 +156,7 @@ class PublishAssets extends BaseCommand
      */
     private function normalizePath(string $path): string
     {
-        $path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
+        $path  = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
         $parts = array_filter(explode(DIRECTORY_SEPARATOR, $path), static fn ($part) => $part !== '');
 
         return implode(DIRECTORY_SEPARATOR, $parts);
@@ -187,10 +186,10 @@ class PublishAssets extends BaseCommand
         try {
             $iterator = new RecursiveIteratorIterator(
                 new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS),
-                RecursiveIteratorIterator::SELF_FIRST
+                RecursiveIteratorIterator::SELF_FIRST,
             );
 
-            $copiedFiles = 0;
+            $copiedFiles  = 0;
             $skippedFiles = 0;
 
             foreach ($iterator as $item) {
@@ -208,6 +207,7 @@ class PublishAssets extends BaseCommand
                     // Check if file already exists
                     if (file_exists($destPath) && ! CLI::getOption('force')) {
                         $skippedFiles++;
+
                         continue;
                     }
 
@@ -230,7 +230,7 @@ class PublishAssets extends BaseCommand
             }
 
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             CLI::error("Error during copy operation: {$e->getMessage()}");
 
             return false;

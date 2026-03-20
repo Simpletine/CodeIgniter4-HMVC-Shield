@@ -72,7 +72,7 @@ class ModuleView extends BaseModuleCommand
     /**
      * Execute the command.
      *
-     * @param array<string> $params
+     * @param list<string> $params
      */
     public function run(array $params): void
     {
@@ -132,4 +132,3 @@ class ModuleView extends BaseModuleCommand
         }
     }
 }
-

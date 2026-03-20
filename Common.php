@@ -13,6 +13,39 @@ declare(strict_types=1);
 
 use CodeIgniter\I18n\Time;
 use CodeIgniter\Shield\Entities\User;
+use CodeIgniter\Shield\Models\LoginModel;
+use Simpletine\HMVCShield\Config\HMVCPaths;
+
+if (! function_exists('stn_view')) {
+    /**
+     * Resolves and renders a SimpleTine package view.
+     *
+     * Resolution order:
+     *   1. app/Config/HMVCPaths::$viewsOverridePath  — user-published views
+     *   2. Package built-in Views/ directory          — default
+     *
+     * @param array<string, mixed> $data
+     */
+    function stn_view(string $view, array $data = [], array $options = []): string
+    {
+        /** @var HMVCPaths $pathsConfig */
+        $pathsConfig = config('HMVCPaths');
+        $override    = $pathsConfig->viewsOverridePath ?? '';
+
+        if ($override !== '') {
+            // Normalise to an absolute path and use namespace-free view() call
+            $overrideAbs = rtrim(ROOTPATH . ltrim($override, '/\\'), '/\\') . DIRECTORY_SEPARATOR;
+            $viewFile    = $overrideAbs . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $view) . '.php';
+
+            if (file_exists($viewFile)) {
+                return view($overrideAbs . $view, $data, $options);
+            }
+        }
+
+        // Fallback: package built-in views (namespace-based path)
+        return view(HMVCSHIELDVIEWS . $view, $data, $options);
+    }
+}
 
 if (! function_exists('user')) {
     /**
@@ -62,7 +95,7 @@ if (! function_exists('last_login')) {
      */
     function last_login(string $text = '')
     {
-        $logins = model(CodeIgniter\Shield\Models\LoginModel::class);
+        $logins = model(LoginModel::class);
         $dates  = $logins->lastLogin(user())->date;
         $date   = '';
 
